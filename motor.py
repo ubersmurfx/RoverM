@@ -5,6 +5,8 @@ GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
 time_delay_seconds = 0.1
 
+'''BCM SETUP PINS '''
+
 A1 = 6
 D4 = 5
 D9 = 16
@@ -14,6 +16,8 @@ A0 = 26
 D7 = 19
 D8 = 13
 PWM_0 = 12
+
+'''BOARD SETUP PINS '''
 
 #A1 = 31
 #D4 = 29
@@ -27,8 +31,9 @@ PWM_0 = 12
 
 
 class rmotor:
-    def __init__(self):
+    def __init__(self, debug = True):
         print("init motors")
+        self.debug = debug
 
     GPIO.setup(D9, GPIO.OUT)
     GPIO.setup(D4, GPIO.OUT)
@@ -45,57 +50,74 @@ class rmotor:
     pwm_signal.start(0)
 
     def modify_pwm1(self, pwm_signal, dutycycle, freq):
-        print("modify pwm ")
+        if (self.debug):
+                print("modify pwm ")
+                
         pwm_signal.ChangeDutyCycle(dutycycle)
         pwm_signal.ChangeFrequency(freq)
 
     def modify_pwm2(self, pwm_signal1, dutycycle, freq):
-        print("modify pwm ")
+        if (self.debug):
+                print("modify pwm ")
+                
         pwm_signal1.ChangeDutyCycle(dutycycle)
         pwm_signal1.ChangeFrequency(freq)
 
     def motor_enabled(self):
-        # print("motor enabled")
+        if (self.debug):
+                print("motor enabled")
+                
         GPIO.output(A1, GPIO.HIGH)
         GPIO.output(A0, GPIO.HIGH)
 
     def motor_stop(self):
-        # print("motor stopped")
+        if (self.debug):
+                print("motor stopped")
+
         GPIO.output(D9, GPIO.LOW)
         GPIO.output(D4, GPIO.LOW)
         GPIO.output(D7, GPIO.LOW)
         GPIO.output(D8, GPIO.LOW)
 
     def rotate_clockwise(self):
-        #print("rotate clockwise")
+        if (self.debug):
+                print("Rotate clockwise")
+                
         GPIO.output(D7, GPIO.HIGH)
         GPIO.output(D8, GPIO.LOW)
         GPIO.output(D9, GPIO.LOW)
         GPIO.output(D4, GPIO.HIGH)
 
     def rotate_counterwise(self):
-        #print("rotate counterclockwise")
+        if (self.debug):
+                print("Rotate counterwise")
+                
         GPIO.output(D7, GPIO.LOW)
         GPIO.output(D8, GPIO.HIGH)
         GPIO.output(D9, GPIO.HIGH)
         GPIO.output(D4, GPIO.LOW)
 
     def turn_left(self):
-        # print("turn left")
+        if (self.debug):
+                print("turn left")
+                
         GPIO.output(D7, GPIO.HIGH)
         GPIO.output(D8, GPIO.LOW)
         GPIO.output(D9, GPIO.HIGH)
         GPIO.output(D4, GPIO.LOW)
 
     def turn_right(self):
-        # print("turn right")
+        if (self.debug):
+                print("Turning right")
+                
         GPIO.output(D7, GPIO.LOW)
         GPIO.output(D8, GPIO.HIGH)
         GPIO.output(D9, GPIO.LOW)
         GPIO.output(D4, GPIO.HIGH)
 
     def destruct(self):
-        # print("motor disabled")
+        if (self.debug):
+                print("motor disabled")
         GPIO.output(A0, GPIO.LOW)
         GPIO.output(A1, GPIO.LOW)
         GPIO.cleanup()
@@ -108,9 +130,17 @@ class rmotor:
         self.rotate_counterwise()
         sleep(0.2)
         self.motor_stop()
-        print("complete")
+        print("Calibration complete")
+        
+    def motor_speed_dercrese(self, m_speed, boost):
+        self.modify_pwm1(self.pwm_signal, m_speed * boost, 3000)
+        self.modify_pwm2(self.pwm_signal1, m_speed * boost, 3000)
 
-    def soft_rotate_right(self, m_speed, boost, k_turn):
+    def motor_speed_increase(self, m_speed, boost):
+        self.modify_pwm1(self.pwm_signal, m_speed * boost, 3000)
+        self.modify_pwm2(self.pwm_signal1, m_speed * boost, 3000)
+        
+''' def soft_rotate_right(self, m_speed, boost, k_turn):
         self.modify_pwm2(self.pwm_signal1, m_speed * boost * k_turn, 3000)
         print("right: ", m_speed * boost * k_turn)
         self.rotate_clockwise()
@@ -122,13 +152,8 @@ class rmotor:
         print("left: ", m_speed * boost * k_turn)
         self.rotate_clockwise()
         sleep(time_delay_seconds)
-        self.modify_pwm1(self.pwm_signal, m_speed * boost, 3000)
+        self.modify_pwm1(self.pwm_signal, m_speed * boost, 3000)'''
 
-    def motor_speed_dercrese(self, m_speed, boost):
-        self.modify_pwm1(self.pwm_signal, m_speed * boost, 3000)
-        self.modify_pwm2(self.pwm_signal1, m_speed * boost, 3000)
 
-    def motor_speed_increase(self, m_speed, boost):
-        self.modify_pwm1(self.pwm_signal, m_speed * boost, 3000)
-        self.modify_pwm2(self.pwm_signal1, m_speed * boost, 3000)
+ 
 
