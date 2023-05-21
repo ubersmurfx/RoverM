@@ -7,7 +7,6 @@ import math
 from motor import *
 import subprocess
 import sys
-#from gpiozero import LoadAverage
 from Event import ServoEvent
 
 '''MOTOR INIT'''
@@ -34,13 +33,11 @@ time_delay_seconds = 0.05
 
 
 class ClientThread(threading.Thread):
-	def __init__(self, ip, port, debug = True):
+	def __init__(self, ip, port, debug = False):
 		self.ip = ip
 		self.port = port
 		self._exit = 1
-		
 		self.r_data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-		
 		self._defaultpackage = 168
 		self.debug = debug
 		self.m_speed = 80
@@ -59,10 +56,10 @@ class ClientThread(threading.Thread):
 					print("Size of recieving data", len(data))
 					
 				if len(data) == 80:
-					print("sucksess")
+					#print("sucksess")
 					self.r_data = struct.unpack("20i", data)
 				else:
-					print("error")
+					#print("error")
 					self.r_data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 				#print("Server received data:", self.r_data)
 				sleep(pulsebeat)
@@ -87,11 +84,11 @@ class ClientThread(threading.Thread):
 		while True:
 			sleep(pulsebeat)
 			if self.r_data[6] == 1:
-				self.cam_angle = serv.decreaseAngle(4, self.cam_angle, 7)
+				serv.decreaseCamAngle(7)
 				sleep(time_delay_seconds)
 			
 			if self.r_data[7] == 1:
-				self.cam_angle = serv.increaseAngle(4, self.cam_angle, 7)
+				serv.increaseCamAngle(7)
 				sleep(time_delay_seconds)
 		
 
@@ -115,44 +112,22 @@ class ClientThread(threading.Thread):
 			sleep(pulsebeat)
 			if self.sstate == 1:
 				try:
-					
+
 					if self.r_data[4] == 1:
-						self.angle1 = serv.increaseAngle(0, self.angle1, 5)
-						self.angle4 = serv.decreaseAngle(3, self.angle4, 5)
-						self.angle2 = serv.decreaseAngle(1, self.angle2, 3)
-						self.angle3 = serv.increaseAngle(2, self.angle3, 5)
+						serv.decreaseWheelAngle(7)
 						sleep(time_delay_seconds)
-						
-						if debug:
-							print("First motor's servo angle: ", self.angle1)
-							print("Second motor's servo angle: ", self.angle2)
-							print("Third motor's servo angle: ", self.angle3)
-							print("Fourth motor's servo angle: ", self.angle4)
 
 					if self.r_data[5] == 1:
-						self.angle1 = serv.decreaseAngle(0, self.angle1, 5)
-						self.angle4 = serv.increaseAngle(3, self.angle4, 5)
-						self.angle2 = serv.increaseAngle(1, self.angle2, 3)
-						self.angle3 = serv.decreaseAngle(2, self.angle3, 5)
+						serv.increaseWheelAngle(7)
 						sleep(time_delay_seconds)
-						
-						if debug:
-							print("First motor's servo angle: ", self.angle1)
-							print("Second motor's servo angle: ", self.angle2)
-							print("Third motor's servo angle: ", self.angle3)
-							print("Fourth motor's servo angle: ", self.angle4)
 
 					if self.r_data[8] == 1:
-						self.man1_angle = serv.increaseAngle(5, self.man1_angle, 7)
+						serv.increaseManAngle(5, 7)
 						sleep(time_delay_seconds)
-						if debug:
-							print("First man's servo anlge: ", self.man1_angle)
 
 					if self.r_data[9] == 1:
-						self.man1_angle = serv.decreaseAngle(5, self.man1_angle, 7)
+						serv.decreaseManAngle(5, 7)
 						sleep(time_delay_seconds)
-						if debug:
-							print("First man's servo anlge: ", self.man1_angle)
 
 					if self.r_data[10] == 1:
 						self.man2_angle = serv.increaseAngle(6, self.man2_angle, 7)

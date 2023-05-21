@@ -5,6 +5,10 @@ GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
 time_delay_seconds = 0.1
 
+'''LAMP PINS '''
+
+LAMP = 22
+
 '''BCM SETUP PINS '''
 
 A1 = 6
@@ -28,10 +32,28 @@ PWM_0 = 12
 #D7 = 35
 #D8 = 33
 #PWM_0 = 32
+class lightBulb:
+	def __init__(self, pin = LAMP, debug = False):
+		self.debug = debug
+		self.pin = pin
+		print("init lamp")
 
+	def setup(self):
+		GPIO.setup(self.pin, GPIO.OUT)
+		GPIO.output(self.pin, GPIO.LOW)
+
+	def lampOn(self):
+		GPIO.output(self.pin, GPIO.HIGH)
+
+	def lampOff(self):
+		GPIO.output(self.pin, GPIO.LOW)
+
+	def destruct(self):
+		GPIO.output(self.pin, GPIO.LOW)
+		GPIO.cleanup()
 
 class rmotor:
-    def __init__(self, debug = True):
+    def __init__(self, debug = False):
         print("init motors")
         self.debug = debug
 
