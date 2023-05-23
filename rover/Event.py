@@ -72,7 +72,7 @@ class ServoEvent():
 
 
 	def decreaseWheelAngle(self, value):
-		if self.angle4 > self.minAngles[3]:
+		if self.angle3 > self.minAngles[2]:
 			self.angle1 = self.angle1 + value
 			self.angle2 = self.angle2 - value
 			self.angle3 = self.angle3 - value
@@ -92,7 +92,7 @@ class ServoEvent():
 			print("Man's angles: ", self.man[0], "    ", self.man[1], "   ", self.man[2], "    ", self.man[3])
 
 	def increaseWheelAngle(self, value):
-		if self.angle4 < self.maxAngles[3]:
+		if self.angle3 < self.maxAngles[2]:
 
 			self.angle1 = self.angle1 - value
 			self.angle2 = self.angle2 + value

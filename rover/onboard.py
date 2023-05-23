@@ -130,41 +130,28 @@ class ClientThread(threading.Thread):
 						sleep(time_delay_seconds)
 
 					if self.r_data[10] == 1:
-						self.man2_angle = serv.increaseAngle(6, self.man2_angle, 7)
+						serv.increaseManAngle(6, 7)
 						sleep(time_delay_seconds)
-						if debug:
-							print("Second man's servo anlge: ", self.man2_angle)
 
 					if self.r_data[11] == 1:
-						self.man2_angle = serv.decreaseAngle(6, self.man2_angle, 7)
+						serv.decreaseManAngle(6, 7)
 						sleep(time_delay_seconds)
-						if debug:
-							print("Second man's servo anlge: ", self.man2_angle)
 
 					if self.r_data[12] == 1:
-						self.man3_angle = serv.increaseAngle(7, self.man3_angle, 10)
+						serv.increaseManAngle(7, 7)
 						sleep(time_delay_seconds)
-						if debug:
-							print("Third man's servo anlge: ", self.man3_angle)
 
 					if self.r_data[13] == 1:
-						self.man3_angle = serv.decreaseAngle(7, self.man3_angle, 10)
+						serv.decreaseManAngle(7, 7)
 						sleep(time_delay_seconds)
-						if debug:
-							print("Third man's servo anlge: ", self.man3_angle)
-
 
 					if self.r_data[14] == 1:
-						self.man4_angle = serv.increaseAngle(8, self.man4_angle, 10)
+						serv.increaseManAngle(8, 7)
 						sleep(time_delay_seconds)
-						if debug:
-							print("Fourth man's servo anlge: ", self.man4_angle)
 
 					if self.r_data[15] == 1:
-						self.man4_angle = serv.decreaseAngle(8, self.man4_angle, 10)
+						serv.decreaseManAngle(8, 7)
 						sleep(time_delay_seconds)
-						if debug:
-							print("Fourth man's servo anlge: ", self.man4_angle)
 
 				except AttributeError:
 					pass
