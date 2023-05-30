@@ -4,30 +4,34 @@ import struct
 from time import sleep
 import smbus
 import math
-from motor import *
+from h39 import rmotor
 import subprocess
 import sys
-from Event import ServoEvent
+from event import ServoEvent
+#from MMSmotor import rmotor
+
+
 
 '''MOTOR INIT'''
 try:
 	motor = rmotor()
-	motor.motor_enabled()
 	sleep(0.1)
 	motor.modify_pwm1(rmotor.pwm_signal, 80, 3000)
 	motor.modify_pwm2(rmotor.pwm_signal1, 80, 3000)
 	print("init complete")
 	sleep(0.1)
+	#motor.calibrate()
 except:
 	print("motor init error")
 
+try:
+	#serv = ServoEvent()
+	#serv.calibrationR()
+	sleep(0.1)
+except:
+	print("servomotors init error")
 
-serv = ServoEvent()
-serv.calibrationR()
-sleep(0.1)
-
-
-'''TIMINGS must match'''
+'''TIMINGS '''
 pulsebeat = 0.04
 time_delay_seconds = 0.05
 
@@ -36,7 +40,6 @@ class ClientThread(threading.Thread):
 	def __init__(self, ip, port, debug = False):
 		self.ip = ip
 		self.port = port
-		self._exit = 1
 		self.r_data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 		self._defaultpackage = 168
 		self.debug = debug
@@ -45,30 +48,43 @@ class ClientThread(threading.Thread):
 		self.boost = 1
 		self.sstate = 1
 		self.mstate = 1
-		print("[+] New server socket thread started from: ", ip + str(port))
+		print("[+] New server started from: ", ip + str(port))
 
 	def reciever(self):
 		_exit = 1
+		count = 0
 		while _exit != 0:
 			try:
 				data = clientsocket.recv(self._defaultpackage)
-				if (self.debug):
-					print("Size of recieving data", len(data))
-					
-				if len(data) == 80:
-					#print("sucksess")
-					self.r_data = struct.unpack("20i", data)
+				#print("Size of recieving data", len(data))
+				if len(data) < 16:
+					count = count + 1
+
+				if len(data) == 84:
+					self.r_data = struct.unpack("21i", data)
+					count = 0
 				else:
-					#print("error")
+					print("Recieved data is corrupted")
+					motor.motor_stop()
 					self.r_data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-				#print("Server received data:", self.r_data)
+					#print("Server received data:", self.r_data)
+
+				if count > 10:
+					motor.motor_stop()
+					_exit = 0
+					print(f"Closing connection to {address}")
+					s.close()
+
 				sleep(pulsebeat)
+				
 			except:
-				print("Error in recieving data")
+				print("Recieved data is corrupted")
 				motor.motor_stop()
 				_exit = 0
-				print("Socket closing")
-				clientsocket.close()
+				print(f"Closing connection to {address}")
+				s.close()
+		#exit()
+
 
 	def run(self):
 		thread1=threading.Thread(target=self.reciever, daemon=False)
@@ -84,26 +100,26 @@ class ClientThread(threading.Thread):
 		while True:
 			sleep(pulsebeat)
 			if self.r_data[6] == 1:
-				serv.decreaseCamAngle(7)
+				#serv.decreaseCamAngle(7)
 				sleep(time_delay_seconds)
 			
 			if self.r_data[7] == 1:
-				serv.increaseCamAngle(7)
+				#serv.increaseCamAngle(7)
 				sleep(time_delay_seconds)
 		
 
 			if self.r_data[16] == 1:
-				if debug:
-					print("Boost enabled")
 				self.boost = 1
 				motor.motor_speed_dercrese(self.m_speed, self.boost)
 				sleep(time_delay_seconds)
 
 			if self.r_data[17] == 1:
-				if debug:
-					print("Boost disabled")
 				self.boost = 0.25
 				motor.motor_speed_increase(self.m_speed, self.boost)
+				sleep(time_delay_seconds)
+
+			if self.r_data[18] == 1:
+				serv.calibrationR()
 				sleep(time_delay_seconds)
 
 
@@ -114,57 +130,45 @@ class ClientThread(threading.Thread):
 				try:
 
 					if self.r_data[4] == 1:
-						serv.decreaseWheelAngle(7)
+						#serv.decreaseWheelAngle(7)
 						sleep(time_delay_seconds)
 
 					if self.r_data[5] == 1:
-						serv.increaseWheelAngle(7)
+						#serv.increaseWheelAngle(7)
 						sleep(time_delay_seconds)
 
 					if self.r_data[8] == 1:
-						serv.increaseManAngle(5, 7)
+						#serv.increaseManAngle(5, 7)
 						sleep(time_delay_seconds)
 
 					if self.r_data[9] == 1:
-						serv.decreaseManAngle(5, 7)
+						#serv.decreaseManAngle(5, 7)
 						sleep(time_delay_seconds)
 
 					if self.r_data[10] == 1:
-						self.man2_angle = serv.increaseAngle(6, self.man2_angle, 7)
+						#serv.increaseManAngle(6, 7)
 						sleep(time_delay_seconds)
-						if debug:
-							print("Second man's servo anlge: ", self.man2_angle)
 
 					if self.r_data[11] == 1:
-						self.man2_angle = serv.decreaseAngle(6, self.man2_angle, 7)
+						#serv.decreaseManAngle(6, 7)
 						sleep(time_delay_seconds)
-						if debug:
-							print("Second man's servo anlge: ", self.man2_angle)
 
 					if self.r_data[12] == 1:
-						self.man3_angle = serv.increaseAngle(7, self.man3_angle, 10)
+						#serv.increaseManAngle(7, 7)
 						sleep(time_delay_seconds)
-						if debug:
-							print("Third man's servo anlge: ", self.man3_angle)
 
 					if self.r_data[13] == 1:
-						self.man3_angle = serv.decreaseAngle(7, self.man3_angle, 10)
+						#serv.decreaseManAngle(7, 7)
 						sleep(time_delay_seconds)
-						if debug:
-							print("Third man's servo anlge: ", self.man3_angle)
-
 
 					if self.r_data[14] == 1:
-						self.man4_angle = serv.increaseAngle(8, self.man4_angle, 10)
+						#serv.increaseManAngle(8, 7)
 						sleep(time_delay_seconds)
-						if debug:
-							print("Fourth man's servo anlge: ", self.man4_angle)
 
 					if self.r_data[15] == 1:
-						self.man4_angle = serv.decreaseAngle(8, self.man4_angle, 10)
+						#serv.decreaseManAngle(8, 7)
 						sleep(time_delay_seconds)
-						if debug:
-							print("Fourth man's servo anlge: ", self.man4_angle)
+
 
 				except AttributeError:
 					pass
@@ -196,24 +200,35 @@ class ClientThread(threading.Thread):
 					pass
 
 '''SOCKET MODULE '''
-HOST = "192.101.77.1"
+HOST = "192.168.0.7"
 PORT = 65432
 
-print("Waiting for connection")
-
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-#s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-s.bind((HOST, PORT))
-s.listen(5)
-clientsocket, address = s.accept()
- 
-print(f"Connected from {address} has been established!")
 
 
-'''MAIN MODULE '''
-
-newconnection = ClientThread(HOST, PORT)
-newconnection.run()
+'''MAIN'''
+if __name__ == "__main__":
+	try:
+		print("Waiting for connection")
+		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+		s.bind((HOST, PORT))
+		s.listen(5)
+		clientsocket, address = s.accept()
+		print(f"Connected from {address} has been established!")
+	except Exception as e:
+		raise ConnectionError(f"Failed to connect to {address}", str(e))
+	
+	
+	newconnection = ClientThread(HOST, PORT)
+	newconnection.run()
+	
+	while True:     # бесконечный цикл
+		try:
+			sleep(10)
+		except KeyboardInterrupt:
+			s.close()
+			break
+		
 
 
 

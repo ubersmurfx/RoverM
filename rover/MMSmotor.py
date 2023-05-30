@@ -32,6 +32,8 @@ PWM_0 = 12
 #D7 = 35
 #D8 = 33
 #PWM_0 = 32
+
+
 class lightBulb:
 	def __init__(self, pin = LAMP, debug = False):
 		self.debug = debug
@@ -161,21 +163,7 @@ class rmotor:
     def motor_speed_increase(self, m_speed, boost):
         self.modify_pwm1(self.pwm_signal, m_speed * boost, 3000)
         self.modify_pwm2(self.pwm_signal1, m_speed * boost, 3000)
-        
-''' def soft_rotate_right(self, m_speed, boost, k_turn):
-        self.modify_pwm2(self.pwm_signal1, m_speed * boost * k_turn, 3000)
-        print("right: ", m_speed * boost * k_turn)
-        self.rotate_clockwise()
-        sleep(time_delay_seconds)
-        self.modify_pwm2(self.pwm_signal1, m_speed * boost, 3000)
 
-    def soft_rotate_left(self, m_speed, boost, k_turn):
-        self.modify_pwm1(self.pwm_signal, m_speed * boost * k_turn, 3000)
-        print("left: ", m_speed * boost * k_turn)
-        self.rotate_clockwise()
-        sleep(time_delay_seconds)
-        self.modify_pwm1(self.pwm_signal, m_speed * boost, 3000)'''
 
 
  
-

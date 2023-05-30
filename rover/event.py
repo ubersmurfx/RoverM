@@ -2,7 +2,7 @@ from servo import ServoController
 
 
 class ServoEvent():
-	def __init__(self):
+	def __init__(self, debug=False):
 		self.controller = ServoController(0x40, debug=False)
 		self.controller.setPWMFreq(50)
 		self.servo_min = 500
@@ -72,7 +72,7 @@ class ServoEvent():
 
 
 	def decreaseWheelAngle(self, value):
-		if self.angle4 > self.minAngles[3]:
+		if self.angle4 < self.maxAngles[3]:
 			self.angle1 = self.angle1 + value
 			self.angle2 = self.angle2 - value
 			self.angle3 = self.angle3 - value
@@ -88,11 +88,11 @@ class ServoEvent():
 			self.angle3 = self.angle3 + value
 			self.angle4 = self.angle4 - value
 
-		if (self.debug):
-			print("Man's angles: ", self.man[0], "    ", self.man[1], "   ", self.man[2], "    ", self.man[3])
+
+		#print("Wheel's angles: ", self.angle1, "    ", self.angle2, "   ", self.angle3, "    ", self.angle4)
 
 	def increaseWheelAngle(self, value):
-		if self.angle4 < self.maxAngles[3]:
+		if self.angle4 > self.minAngles[3]:
 
 			self.angle1 = self.angle1 - value
 			self.angle2 = self.angle2 + value
@@ -110,8 +110,7 @@ class ServoEvent():
 			self.angle4 = self.angle4 + value
 
 
-		if (self.debug):
-			print("Man's angles: ", self.man[0], "    ", self.man[1], "   ", self.man[2], "    ", self.man[3])
+		#print("Wheel's angles: ", self.angle1, "    ", self.angle2, "   ", self.angle3, "    ", self.angle4)
 
 	def increaseCamAngle(self, value):
 		if self.cam_angle < self.maxAngles[4]:
@@ -121,7 +120,7 @@ class ServoEvent():
 			self.cam_angle = self.cam_angle - value
 
 		if (self.debug):
-			print("cam angle: ", self.cam_angle")
+			print("cam angle: ", self.cam_angle)
 
 	def decreaseCamAngle(self, value):
 		if self.cam_angle > self.minAngles[4]:
@@ -131,28 +130,28 @@ class ServoEvent():
 			self.cam_angle = self.cam_angle + value
 
 		if (self.debug):
-			print("cam angle: ", self.cam_angle")
+			print("cam angle: ", self.cam_angle)
 
 	def increaseManAngle(self, channel, value):
 		select = channel - 5
 		if self.man[select] < self.maxAngles[channel]:
 			self.man[select] = self.man[select] + value
 			self.set_angle90(channel, self.man[select])
-			print(self.man[select])
+			#print(self.man[select])
 		else:
 			self.man[select] = self.man[select] - value
 
-		if (self.debug):
+		if 2>1:
 			print("man", channel - 5, ": ", self.man[select])
 
 	def decreaseManAngle(self, channel, value):
 		select = channel - 5
-		if self.man[select] < self.maxAngles[channel]:
+		if self.man[select] > self.minAngles[channel]:
 			self.man[select] = self.man[select] - value
 			self.set_angle90(channel, self.man[select])
-			print(self.man[select])
+			#print(self.man[select])
 		else:
 			self.man[select] = self.man[select] + value
 
-		if (self.debug):
+		if 2>1:
 			print("man", channel - 5, ": ", self.man[select])
