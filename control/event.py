@@ -65,10 +65,10 @@ class ServoEvent():
 		self.set_angle90(2, self.angle3)
 		self.set_angle90(3, self.angle4)
 		self.set_angle90(4, self.cam_angle)
-		self.set_angle90(5, self.man[0])
-		self.set_angle90(6, self.man[1])
-		self.set_angle90(7, self.man[2])
-		self.set_angle90(8, self.man[3])
+		#self.set_angle90(5, self.man[0])
+		#self.set_angle90(6, self.man[1])
+		#self.set_angle90(7, self.man[2])
+		#self.set_angle90(8, self.man[3])
 
 
 	def decreaseWheelAngle(self, value):
@@ -89,7 +89,7 @@ class ServoEvent():
 			self.angle4 = self.angle4 - value
 
 
-		#print("Wheel's angles: ", self.angle1, "    ", self.angle2, "   ", self.angle3, "    ", self.angle4)
+		print("Wheel's angles: ", self.angle1, "    ", self.angle2, "   ", self.angle3, "    ", self.angle4)
 
 	def increaseWheelAngle(self, value):
 		if self.angle4 > self.minAngles[3]:
@@ -110,7 +110,7 @@ class ServoEvent():
 			self.angle4 = self.angle4 + value
 
 
-		#print("Wheel's angles: ", self.angle1, "    ", self.angle2, "   ", self.angle3, "    ", self.angle4)
+		print("Wheel's angles: ", self.angle1, "    ", self.angle2, "   ", self.angle3, "    ", self.angle4)
 
 	def increaseCamAngle(self, value):
 		if self.cam_angle < self.maxAngles[4]:

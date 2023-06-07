@@ -25,9 +25,10 @@ except:
 	print("motor init error")
 
 try:
-	#serv = ServoEvent()
+	serv = ServoEvent()
+	sleep(0.5)
 	#serv.calibrationR()
-	sleep(0.1)
+	sleep(0.5)
 except:
 	print("servomotors init error")
 
@@ -56,8 +57,8 @@ class ClientThread(threading.Thread):
 		while _exit != 0:
 			try:
 				data = clientsocket.recv(self._defaultpackage)
-				#print("Size of recieving data", len(data))
-				if len(data) < 16:
+				print("Size of recieving data", len(data))
+				if len(data) < 83:
 					count = count + 1
 
 				if len(data) == 84:
@@ -100,11 +101,11 @@ class ClientThread(threading.Thread):
 		while True:
 			sleep(pulsebeat)
 			if self.r_data[6] == 1:
-				#serv.decreaseCamAngle(7)
+				serv.decreaseCamAngle(7)
 				sleep(time_delay_seconds)
 			
 			if self.r_data[7] == 1:
-				#serv.increaseCamAngle(7)
+				serv.increaseCamAngle(7)
 				sleep(time_delay_seconds)
 		
 
@@ -130,43 +131,43 @@ class ClientThread(threading.Thread):
 				try:
 
 					if self.r_data[4] == 1:
-						#serv.decreaseWheelAngle(7)
+						serv.decreaseWheelAngle(7)
 						sleep(time_delay_seconds)
 
 					if self.r_data[5] == 1:
-						#serv.increaseWheelAngle(7)
+						serv.increaseWheelAngle(7)
 						sleep(time_delay_seconds)
 
 					if self.r_data[8] == 1:
-						#serv.increaseManAngle(5, 7)
+						serv.increaseManAngle(5, 7)
 						sleep(time_delay_seconds)
 
 					if self.r_data[9] == 1:
-						#serv.decreaseManAngle(5, 7)
+						serv.decreaseManAngle(5, 7)
 						sleep(time_delay_seconds)
 
 					if self.r_data[10] == 1:
-						#serv.increaseManAngle(6, 7)
+						serv.increaseManAngle(6, 7)
 						sleep(time_delay_seconds)
 
 					if self.r_data[11] == 1:
-						#serv.decreaseManAngle(6, 7)
+						serv.decreaseManAngle(6, 7)
 						sleep(time_delay_seconds)
 
 					if self.r_data[12] == 1:
-						#serv.increaseManAngle(7, 7)
+						serv.increaseManAngle(7, 7)
 						sleep(time_delay_seconds)
 
 					if self.r_data[13] == 1:
-						#serv.decreaseManAngle(7, 7)
+						serv.decreaseManAngle(7, 7)
 						sleep(time_delay_seconds)
 
 					if self.r_data[14] == 1:
-						#serv.increaseManAngle(8, 7)
+						serv.increaseManAngle(8, 7)
 						sleep(time_delay_seconds)
 
 					if self.r_data[15] == 1:
-						#serv.decreaseManAngle(8, 7)
+						serv.decreaseManAngle(8, 7)
 						sleep(time_delay_seconds)
 
 
@@ -187,12 +188,13 @@ class ClientThread(threading.Thread):
 						
 
 					elif self.r_data[3] == 1:
-						motor.turn_left()
+						#motor.turn_left()
+						motor.turn_right()
 						
 
 					elif self.r_data[2] == 1:
-						motor.turn_right()
-						
+						#motor.turn_right()
+						motor.turn_left()
 					else:
 						motor.motor_stop()
 						
@@ -200,7 +202,7 @@ class ClientThread(threading.Thread):
 					pass
 
 '''SOCKET MODULE '''
-HOST = "192.168.0.7"
+HOST = "192.168.0.10"
 PORT = 65432
 
 
