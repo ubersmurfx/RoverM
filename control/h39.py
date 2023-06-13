@@ -17,6 +17,27 @@ R2 = 20
 L2 = 16
 PWM2 = 12
 
+LAMP = 17
+
+class lightBulb:
+	def __init__(self, pin = LAMP, debug = True):
+		self.debug = debug
+		self.pin = pin
+		print("init lamp")
+
+	def setup(self):
+		GPIO.setup(self.pin, GPIO.OUT)
+		GPIO.output(self.pin, GPIO.LOW)
+
+	def lampOn(self):
+                GPIO.output(self.pin, GPIO.HIGH)
+                #print("lamp On")
+	def lampOff(self):
+		GPIO.output(self.pin, GPIO.LOW)
+
+	def destruct(self):
+		GPIO.output(self.pin, GPIO.LOW)
+		GPIO.cleanup()
 
 
 class rmotor:

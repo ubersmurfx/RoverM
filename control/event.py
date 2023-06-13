@@ -9,42 +9,42 @@ class ServoEvent():
 		self.servo_max = 3000
 		self.debug = debug
 		self.angle1 = 255
-		self.angle2 = 250
-		self.angle3 = 250
-		self.angle4 = 225
-		self.cam_angle = 250
+		self.angle2 = 255
+		self.angle3 = 255
+		self.angle4 = 255
+		self.cam_angle = 255
 		self.man = [230, 230, 237, 250]
-		self.calibrateAngles = [255, 250, 250, 225, 244, 230, 230, 237, 250]
+		self.calibrateAngles = [255, 255, 255, 255, 255, 255, 240, 255, 255]
 
 		self.maxAngles = {
-		0: 350,
-		1: 350,
-		2: 350,
-		3: 310,
+		0: 345,
+		1: 345,
+		2: 345,
+		3: 345,
 		4: 275,
-		5: 326,
+		5: 310,
 		6: 390,
-		7: 320,
+		7: 355,
 		8: 440
 		}
 		self.minAngles = {
-		0: 140,
-		1: 140,
-		2: 140,
-		3: 140,
+		0: 145,
+		1: 145,
+		2: 145,
+		3: 145,
 		4: 185,
-		5: 140,
-		6: 170,
-		7: 130,
-		8: 115
+		5: 200,
+		6: 140,
+		7: 155,
+		8: 120
 		}
 		print("init servo")
 
 	def set_angle90(self, channel, required_angle):
-		self.controller.Set_Pulse(channel, ServoController.map(required_angle, 0, 180, self.servo_min, self.servo_max))
+		self.controller.Set_Pulse(channel, ServoController.map(required_angle, 0, 90, self.servo_min, self.servo_max))
 
 	def set_angle120(self, channel, required_angle):
-		self.controller.Set_Pulse(channel, ServoController.map(required_angle, 0, 180, self.servo_min, self. servo_max))
+		self.controller.Set_Pulse(channel, ServoController.map(required_angle, 0, 120, self.servo_min, self. servo_max))
 
 	def set_angle180(self, channel, required_angle):
 		self.controller.Set_Pulse(channel, ServoController.map(required_angle, 0, 180, self.servo_min, self.servo_max))	
@@ -60,15 +60,15 @@ class ServoEvent():
 		self.man[2] = self.calibrateAngles[7]
 		self.man[3] = self.calibrateAngles[8]
 
-		self.set_angle90(0, self.angle1)
-		self.set_angle90(1, self.angle2)
-		self.set_angle90(2, self.angle3)
-		self.set_angle90(3, self.angle4)
-		self.set_angle90(4, self.cam_angle)
-		#self.set_angle90(5, self.man[0])
-		#self.set_angle90(6, self.man[1])
-		#self.set_angle90(7, self.man[2])
-		#self.set_angle90(8, self.man[3])
+		self.set_angle180(0, self.angle1)
+		self.set_angle180(1, self.angle2)
+		self.set_angle180(2, self.angle3)
+		self.set_angle180(3, self.angle4)
+		self.set_angle180(4, self.cam_angle)
+		self.set_angle180(5, self.man[0])
+		self.set_angle180(6, self.man[1])
+		self.set_angle180(7, self.man[2])
+		self.set_angle180(8, self.man[3])
 
 
 	def decreaseWheelAngle(self, value):
@@ -78,10 +78,10 @@ class ServoEvent():
 			self.angle3 = self.angle3 - value
 			self.angle4 = self.angle4 + value
 
-			self.set_angle90(0, self.angle1)
-			self.set_angle90(1, self.angle2)
-			self.set_angle90(2, self.angle3)
-			self.set_angle90(3, self.angle4)
+			self.set_angle180(0, self.angle1)
+			self.set_angle180(1, self.angle2)
+			self.set_angle180(2, self.angle3)
+			self.set_angle180(3, self.angle4)
 		else:
 			self.angle1 = self.angle1 - value
 			self.angle2 = self.angle2 + value
@@ -99,10 +99,10 @@ class ServoEvent():
 			self.angle3 = self.angle3 + value
 			self.angle4 = self.angle4 - value
 
-			self.set_angle90(0, self.angle1)
-			self.set_angle90(1, self.angle2)
-			self.set_angle90(2, self.angle3)
-			self.set_angle90(3, self.angle4)
+			self.set_angle180(0, self.angle1)
+			self.set_angle180(1, self.angle2)
+			self.set_angle180(2, self.angle3)
+			self.set_angle180(3, self.angle4)
 		else:
 			self.angle1 = self.angle1 + value
 			self.angle2 = self.angle2 - value
@@ -115,7 +115,7 @@ class ServoEvent():
 	def increaseCamAngle(self, value):
 		if self.cam_angle < self.maxAngles[4]:
 			self.cam_angle = self.cam_angle + value
-			self.set_angle90(4, self.cam_angle)
+			self.set_angle180(4, self.cam_angle)
 		else:
 			self.cam_angle = self.cam_angle - value
 
@@ -125,7 +125,7 @@ class ServoEvent():
 	def decreaseCamAngle(self, value):
 		if self.cam_angle > self.minAngles[4]:
 			self.cam_angle = self.cam_angle - value
-			self.set_angle90(4, self.cam_angle)
+			self.set_angle180(4, self.cam_angle)
 		else:
 			self.cam_angle = self.cam_angle + value
 
@@ -136,7 +136,7 @@ class ServoEvent():
 		select = channel - 5
 		if self.man[select] < self.maxAngles[channel]:
 			self.man[select] = self.man[select] + value
-			self.set_angle90(channel, self.man[select])
+			self.set_angle180(channel, self.man[select])
 			#print(self.man[select])
 		else:
 			self.man[select] = self.man[select] - value
@@ -148,7 +148,7 @@ class ServoEvent():
 		select = channel - 5
 		if self.man[select] > self.minAngles[channel]:
 			self.man[select] = self.man[select] - value
-			self.set_angle90(channel, self.man[select])
+			self.set_angle180(channel, self.man[select])
 			#print(self.man[select])
 		else:
 			self.man[select] = self.man[select] + value

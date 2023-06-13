@@ -4,13 +4,22 @@ import struct
 from time import sleep
 import smbus
 import math
-from h39 import rmotor
+from h39 import rmotor, lightBulb
 import subprocess
 import sys
 from event import ServoEvent
 #from MMSmotor import rmotor
 
+'''LAMP INIT'''
 
+try:
+	lamp = lightBulb()
+	sleep(0.1)
+	lamp.setup()
+	print("Lamp init complete")
+except:
+	lamp.destruct()
+	
 
 '''MOTOR INIT'''
 try:
@@ -22,15 +31,17 @@ try:
 	sleep(0.1)
 	#motor.calibrate()
 except:
-	print("motor init error")
+	print("Motor init error")
+
+'''SERVO MOTOR'S INIT'''
 
 try:
 	serv = ServoEvent()
-	sleep(0.5)
-	#serv.calibrationR()
-	sleep(0.5)
+	sleep(0.3)
+	serv.calibrationR()
+	sleep(0.3)
 except:
-	print("servomotors init error")
+	print("Servo init error")
 
 '''TIMINGS '''
 pulsebeat = 0.04
@@ -41,7 +52,7 @@ class ClientThread(threading.Thread):
 	def __init__(self, ip, port, debug = False):
 		self.ip = ip
 		self.port = port
-		self.r_data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+		self.r_data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 		self._defaultpackage = 168
 		self.debug = debug
 		self.m_speed = 80
@@ -49,6 +60,7 @@ class ClientThread(threading.Thread):
 		self.boost = 1
 		self.sstate = 1
 		self.mstate = 1
+		self.lampState = 0
 		print("[+] New server started from: ", ip + str(port))
 
 	def reciever(self):
@@ -57,7 +69,7 @@ class ClientThread(threading.Thread):
 		while _exit != 0:
 			try:
 				data = clientsocket.recv(self._defaultpackage)
-				print("Size of recieving data", len(data))
+				#print("Size of recieving data", len(data))
 				if len(data) < 83:
 					count = count + 1
 
@@ -67,7 +79,8 @@ class ClientThread(threading.Thread):
 				else:
 					print("Recieved data is corrupted")
 					motor.motor_stop()
-					self.r_data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+					lamp.lampOff()
+					self.r_data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 					#print("Server received data:", self.r_data)
 
 				if count > 10:
@@ -77,7 +90,7 @@ class ClientThread(threading.Thread):
 					s.close()
 
 				sleep(pulsebeat)
-				
+
 			except:
 				print("Recieved data is corrupted")
 				motor.motor_stop()
@@ -94,20 +107,20 @@ class ClientThread(threading.Thread):
 		thread2.start()
 		thread4=threading.Thread(target=self.servorer, daemon=True)
 		thread4.start()
-		thread5=threading.Thread(target=self.cameraman, daemon=True)
+		thread5=threading.Thread(target=self.utiliter, daemon=True)
 		thread5.start()
 
-	def cameraman(self):
+	def utiliter(self):
 		while True:
 			sleep(pulsebeat)
 			if self.r_data[6] == 1:
-				serv.decreaseCamAngle(7)
-				sleep(time_delay_seconds)
-			
+				serv.decreaseCamAngle(3)
+				#sleep(time_delay_seconds)
+
 			if self.r_data[7] == 1:
-				serv.increaseCamAngle(7)
-				sleep(time_delay_seconds)
-		
+				serv.increaseCamAngle(3)
+				#sleep(time_delay_seconds)
+
 
 			if self.r_data[16] == 1:
 				self.boost = 1
@@ -115,7 +128,7 @@ class ClientThread(threading.Thread):
 				sleep(time_delay_seconds)
 
 			if self.r_data[17] == 1:
-				self.boost = 0.25
+				self.boost = 0.4
 				motor.motor_speed_increase(self.m_speed, self.boost)
 				sleep(time_delay_seconds)
 
@@ -123,6 +136,13 @@ class ClientThread(threading.Thread):
 				serv.calibrationR()
 				sleep(time_delay_seconds)
 
+			if self.r_data[19] == 1:
+				lamp.lampOn()
+				sleep(time_delay_seconds)
+
+			if self.r_data[20] == 1:
+				lamp.lampOff()
+				sleep(time_delay_seconds)
 
 	def servorer(self):
 		while True:
@@ -132,43 +152,43 @@ class ClientThread(threading.Thread):
 
 					if self.r_data[4] == 1:
 						serv.decreaseWheelAngle(7)
-						sleep(time_delay_seconds)
+						#sleep(time_delay_seconds)
 
 					if self.r_data[5] == 1:
 						serv.increaseWheelAngle(7)
-						sleep(time_delay_seconds)
+						#sleep(time_delay_seconds)
 
 					if self.r_data[8] == 1:
-						serv.increaseManAngle(5, 7)
-						sleep(time_delay_seconds)
+						serv.increaseManAngle(5, 4)
+						#sleep(time_delay_seconds )
 
 					if self.r_data[9] == 1:
-						serv.decreaseManAngle(5, 7)
-						sleep(time_delay_seconds)
+						serv.decreaseManAngle(5, 4)
+						#sleep(time_delay_seconds)
 
 					if self.r_data[10] == 1:
-						serv.increaseManAngle(6, 7)
-						sleep(time_delay_seconds)
+						serv.increaseManAngle(6, 4)
+						#sleep(time_delay_seconds)
 
 					if self.r_data[11] == 1:
-						serv.decreaseManAngle(6, 7)
-						sleep(time_delay_seconds)
+						serv.decreaseManAngle(6, 4)
+						#sleep(time_delay_seconds)
 
 					if self.r_data[12] == 1:
-						serv.increaseManAngle(7, 7)
-						sleep(time_delay_seconds)
+						serv.increaseManAngle(7, 4)
+						# sleep(time_delay_seconds)
 
 					if self.r_data[13] == 1:
-						serv.decreaseManAngle(7, 7)
-						sleep(time_delay_seconds)
+						serv.decreaseManAngle(7, 4)
+						# sleep(time_delay_seconds)
 
 					if self.r_data[14] == 1:
-						serv.increaseManAngle(8, 7)
-						sleep(time_delay_seconds)
+						serv.increaseManAngle(8, 6)
+						# sleep(time_delay_seconds)
 
 					if self.r_data[15] == 1:
-						serv.decreaseManAngle(8, 7)
-						sleep(time_delay_seconds)
+						serv.decreaseManAngle(8, 6)
+						# sleep(time_delay_seconds)
 
 
 				except AttributeError:
@@ -181,28 +201,28 @@ class ClientThread(threading.Thread):
 				try:
 					if self.r_data[0] == 1:
 						motor.rotate_clockwise()
-						
-							
+
+
 					elif self.r_data[1] == 1:
 						motor.rotate_counterwise()
-						
+
 
 					elif self.r_data[3] == 1:
 						#motor.turn_left()
 						motor.turn_right()
-						
+
 
 					elif self.r_data[2] == 1:
 						#motor.turn_right()
 						motor.turn_left()
 					else:
 						motor.motor_stop()
-						
+
 				except AttributeError:
 					pass
 
 '''SOCKET MODULE '''
-HOST = "192.168.0.10"
+HOST = "192.168.0.13"
 PORT = 65432
 
 
@@ -219,18 +239,18 @@ if __name__ == "__main__":
 		print(f"Connected from {address} has been established!")
 	except Exception as e:
 		raise ConnectionError(f"Failed to connect to {address}", str(e))
-	
-	
+
+
 	newconnection = ClientThread(HOST, PORT)
 	newconnection.run()
-	
+
 	while True:     # бесконечный цикл
 		try:
 			sleep(10)
 		except KeyboardInterrupt:
 			s.close()
 			break
-		
+
 
 
 

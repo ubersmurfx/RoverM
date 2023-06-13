@@ -7,7 +7,7 @@ time_delay_seconds = 0.1
 
 '''LAMP PINS '''
 
-LAMP = 22
+LAMP = 17
 
 '''BCM SETUP PINS '''
 
@@ -53,6 +53,7 @@ class lightBulb:
 	def destruct(self):
 		GPIO.output(self.pin, GPIO.LOW)
 		GPIO.cleanup()
+
 
 class rmotor:
     def __init__(self, debug = False):
