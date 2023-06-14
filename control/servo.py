@@ -4,8 +4,6 @@ import smbus
 
 
 class ServoController:
-    servo90_min = 500
-    servo90_max = 5000
     ADDRESS_1 = 0x02
     ADDRESS_2 = 0x03
     ADDRESS_3 = 0x04
