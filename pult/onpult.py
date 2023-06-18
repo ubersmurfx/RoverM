@@ -1,44 +1,48 @@
 import struct
+import sys
 import threading
-import time
-from pynput import keyboard
-import cval
+from time import sleep
 import socket
+import cval
 
-HOST = "192.101.77.1"
-PORT = 65432
+try:
+    from pynput import keyboard
+except ImportError:
+    keyboard = None
+    print("Pynput module is not installed. Use the command 'pip install pynput' in the terminal")
 
 try:
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((HOST, PORT))
+    s.connect((cval.HOST, cval.PORT))
     send_data = []
 except Exception as e:
-    print("Error start socket")
+    print(sys.exc_info(), "\t", e)
 
 
 def send_to_robot(package):
-    refPackage = struct.pack("20i",
-                             package[0],
-                             package[1],
-                             package[2],
-                             package[3],
-                             package[4],
-                             package[5],
-                             package[6],
-                             package[7],
-                             package[8],
-                             package[9],
-                             package[10],
-                             package[11],
-                             package[12],
-                             package[13],
-                             package[14],
-                             package[15],
-                             package[16],
-                             package[17],
-                             package[18],
-                             package[19])
-    s.send(refPackage)
+    ref_package = struct.pack("21i",
+                              package[0],
+                              package[1],
+                              package[2],
+                              package[3],
+                              package[4],
+                              package[5],
+                              package[6],
+                              package[7],
+                              package[8],
+                              package[9],
+                              package[10],
+                              package[11],
+                              package[12],
+                              package[13],
+                              package[14],
+                              package[15],
+                              package[16],
+                              package[17],
+                              package[18],
+                              package[19],
+                              package[20])
+    s.send(ref_package)
 
 
 def set_value(pos, value, package):
@@ -46,7 +50,7 @@ def set_value(pos, value, package):
 
 
 class Control(threading.Thread):
-    control_data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    control_data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
     def __init__(self):
         self.control_data = Control.control_data
@@ -55,10 +59,10 @@ class Control(threading.Thread):
         threading.Thread.__init__(self, daemon=True)
         self._keyboard = None
 
-    def fromKeyboard(self):
-        self._connectKeyboardHandlers()
+    def from_keyboard(self):
+        self.connect_keyboard_handlers()
 
-    def _connectKeyboardHandlers(self):
+    def connect_keyboard_handlers(self):
         def on_press(key):
             try:
                 match key.char:
@@ -100,12 +104,10 @@ class Control(threading.Thread):
                         set_value(17, 1, self.control_data)
                     case cval.CALIBRATE_ALL:
                         set_value(18, 1, self.control_data)
-                    # case cval.LINETRACKING:
-                    #    set_value(19, 1, self.control_data)
-                    # case cval.LINEUP:
-                    #    set_value(20, 1, self.control_data)
-                    # case cval.LINEDOWN:
-                    #    set_value(21, 1, self.control_data)
+                    case cval.LAMPON:
+                        set_value(19, 1, self.control_data)
+                    case cval.LAMPOFF:
+                        set_value(20, 1, self.control_data)
             except AttributeError:
                 pass
 
@@ -150,12 +152,10 @@ class Control(threading.Thread):
                         set_value(17, 0, self.control_data)
                     case cval.CALIBRATE_ALL:
                         set_value(18, 0, self.control_data)
-                    # case cval.LINETRACKING:
-                    #    set_value(19, 0, self.control_data)
-                    # case cval.LINEUP:
-                    #    set_value(20, 0, self.control_data)
-                    # case cval.LINEDOWN:
-                    #    set_value(21, 0, self.control_data)
+                    case cval.LAMPON:
+                        set_value(19, 0, self.control_data)
+                    case cval.LAMPOFF:
+                        set_value(20, 0, self.control_data)
             except AttributeError:
                 pass
 
@@ -164,29 +164,39 @@ class Control(threading.Thread):
         self._keyboard.join()
 
     def run(self):
-        self._connectKeyboardHandlers()
+        self.connect_keyboard_handlers()
 
 
-class pulsar(Control):
+class Sender(Control):
     def __init__(self):
         threading.Thread.__init__(self, daemon=True)
 
     def run(self):
-        c = 1
-        while c != 0:
+        _exit = 1
+        while _exit != 0:
             try:
                 print("send")
                 send_to_robot(Control.control_data)
-                time.sleep(0.05)
-            except:
-                c = 0
-                print("Closing socket")
+                sleep(cval.delay)
+            except Exception as err:
+                _exit = 0
+                print(sys.exc_info(), "\t", err)
                 s.close()
 
 
-pulsar = pulsar()
-pulsar.start()
-print("starting control")
-motor = Control()
-motor.fromKeyboard()
-motor.start()
+try:
+    data_exchanger = Sender()
+    data_exchanger.start()
+except Exception:
+    print(sys.exc_info())
+
+print("The remote control has been successfully configured")
+
+try:
+    motor = Control()
+    motor.from_keyboard()
+    motor.start()
+except Exception:
+    print(sys.exc_info())
+
+
