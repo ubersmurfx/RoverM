@@ -8,7 +8,6 @@ import cval
 try:
     from pynput import keyboard
 except ImportError:
-    keyboard = None
     print("Pynput module is not installed. Use the command 'pip install pynput' in the terminal")
 
 try:

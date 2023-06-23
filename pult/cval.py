@@ -2,7 +2,7 @@
 
 
 delay = 0.05
-HOST = "192.168.0.65"
+HOST = "192.168.0.77"
 PORT = 65432
 
 MOVE_FORWARD = "w"
