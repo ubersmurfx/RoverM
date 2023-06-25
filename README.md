@@ -49,9 +49,9 @@ ssh rover1@192.168.0.17
 Для переходим на вкладку создание проекта.
 ![image](https://github.com/Ubersmurf2010/RoverM/assets/113335397/5352eaeb-1025-4944-a871-a1a9ef9b8fbd)
 На этой вкладке выбираем Get from VCS. 
-Version control: git
-URL: https://github.com/Ubersmurf2010/RoverM.git
-Directory: выбираем папку, куда необходимо клонировать репозиторий проекта. 
+- Version control: git
+- URL: https://github.com/Ubersmurf2010/RoverM.git
+- Directory: выбираем папку, куда необходимо клонировать репозиторий проекта. 
 Если PyCharm пишет, что git не установлен, значит его необходимо установить. (кнопка ниже Download and install)
 После нажимаем кнопку CLone. 
 
