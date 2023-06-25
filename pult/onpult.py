@@ -192,9 +192,9 @@ except Exception:
 print("The remote control has been successfully configured")
 
 try:
-    motor = Control()
-    motor.from_keyboard()
-    motor.start()
+    connection = Control()
+    connection.from_keyboard()
+    connection.start()
 except Exception:
     print(sys.exc_info())
 
