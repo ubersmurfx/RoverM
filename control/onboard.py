@@ -1,64 +1,70 @@
 import socket
 import threading
 import struct
-from time import sleep
 import smbus
-import math
-from h39 import rmotor, lightBulb
 import subprocess
 import sys
+import numpy as np
+from time import sleep
+import math
+
+from h39 import rmotor, lightBulb
 from event import ServoEvent
-#from MMSmotor import rmotor
-
-'''LAMP INIT'''
-
-try:
-	lamp = lightBulb()
-	sleep(0.1)
-	lamp.setup()
-	print("Lamp init complete")
-except:
-	lamp.destruct()
-	
-
-'''MOTOR INIT'''
-try:
-	motor = rmotor()
-	sleep(0.1)
-	motor.modify_pwm1(rmotor.pwm_signal, 80, 3000)
-	motor.modify_pwm2(rmotor.pwm_signal1, 80, 3000)
-	print("init complete")
-	sleep(0.1)
-	#motor.calibrate()
-except:
-	print("Motor init error")
-
-'''SERVO MOTOR'S INIT'''
-
-try:
-	serv = ServoEvent()
-	sleep(0.3)
-	serv.calibrationR()
-	sleep(0.3)
-except:
-	print("Servo init error")
+import library
 
 '''TIMINGS '''
 pulsebeat = 0.04
 time_delay_seconds = 0.05
+time_calibrate = 0.1
+
+'''LAMP INIT'''
+try:
+	lamp = lightBulb()
+	sleep(time_calibrate)
+	lamp.setup()
+	print("Lamp init complete")
+except:
+	lamp.destruct()
+
+
+'''MOTOR INIT'''
+try:
+	motor = rmotor()
+	sleep(time_calibrate)
+	motor.modify_pwm1(rmotor.pwm_signal, 80, 3000)
+	motor.modify_pwm2(rmotor.pwm_signal1, 80, 3000)
+	print("Motor init complete")
+	sleep(time_calibrate)
+except:
+	print("Motor init error")
+
+'''SERVO MOTOR'S INIT'''
+try:
+	serv = ServoEvent()
+	sleep(time_calibrate * 3)
+	serv.calibrationR()
+	sleep(time_calibrate * 3)
+	print("Servo init complete")
+except:
+	print("Servo init error")
 
 
 class ClientThread(threading.Thread):
 	def __init__(self, ip, port, debug = False):
 		self.ip = ip
 		self.port = port
-		self.r_data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-		self._defaultpackage = 168
+		self.r_data = [0, 0, 0, 0, 0,
+			       0, 0, 0, 0, 0,
+			       0, 0, 0, 0, 0,
+			       0, 0, 0, 0, 0,
+			       0, 0, 0, 0, 0,
+			       0]
+		self._defaultpackage = 52
 		self.debug = debug
 		self.m_speed = 80
 		self.k_turn = 0.4
 		self.boost = 1
-		self.sstate = 1
+		self.sstate = 0
 		self.mstate = 1
 		self.lampState = 0
 		print("[+] New server started from: ", ip + str(port))
@@ -69,78 +75,74 @@ class ClientThread(threading.Thread):
 		while _exit != 0:
 			try:
 				data = clientsocket.recv(self._defaultpackage)
-				#print("Size of recieving data", len(data))
-				if len(data) < 83:
+				if (self.debug):
+					print("Size of recieving data", len(data))
+				if (len(data) < 26):
 					count = count + 1
-
-				if len(data) == 84:
-					self.r_data = struct.unpack("21i", data)
+				if len(data) == 26:
+					self.r_data = np.frombuffer(data, dtype=np.uint8)
+					if ((np.sum(self.r_data) - self.r_data[25]) % 2) != self.r_data[25]:
+						print("Parity bit")
+						count = count + 1
 					count = 0
 				else:
 					print("Recieved data is corrupted")
 					motor.motor_stop()
 					lamp.lampOff()
-					self.r_data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-					#print("Server received data:", self.r_data)
-
+					self.r_data = [0, 0, 0, 0, 0,
+						       0, 0, 0, 0, 0,
+  						       0, 0, 0, 0, 0,
+						       0, 0, 0, 0, 0,
+						       0, 0, 0, 0, 0,
+						       0]
 				if count > 10:
 					motor.motor_stop()
 					_exit = 0
 					print(f"Closing connection to {address}")
 					s.close()
-
 				sleep(pulsebeat)
 
 			except:
-				print("Recieved data is corrupted")
 				motor.motor_stop()
 				_exit = 0
 				print(f"Closing connection to {address}")
 				s.close()
-		#exit()
-
 
 	def run(self):
 		thread1=threading.Thread(target=self.reciever, daemon=False)
 		thread1.start()
 		thread2=threading.Thread(target=self.machinist, daemon=True)
 		thread2.start()
-		thread4=threading.Thread(target=self.servorer, daemon=True)
+		thread3=threading.Thread(target=self.servorer, daemon=True)
+		thread3.start()
+		thread4=threading.Thread(target=self.utiliter, daemon=True)
 		thread4.start()
-		thread5=threading.Thread(target=self.utiliter, daemon=True)
-		thread5.start()
 
 	def utiliter(self):
 		while True:
 			sleep(pulsebeat)
-			if self.r_data[6] == 1:
+			if self.r_data[library.keyboard["1"]] == 1:
 				serv.decreaseCamAngle(3)
-				#sleep(time_delay_seconds)
-
-			if self.r_data[7] == 1:
+			if self.r_data[library.keyboard["2"]] == 1:
 				serv.increaseCamAngle(3)
-				#sleep(time_delay_seconds)
 
-
-			if self.r_data[16] == 1:
+			if self.r_data[library.keyboard["x"]] == 1:
 				self.boost = 1
 				motor.motor_speed_dercrese(self.m_speed, self.boost)
 				sleep(time_delay_seconds)
-
-			if self.r_data[17] == 1:
+			if self.r_data[library.keyboard["z"]] == 1:
 				self.boost = 0.4
 				motor.motor_speed_increase(self.m_speed, self.boost)
 				sleep(time_delay_seconds)
 
-			if self.r_data[18] == 1:
+			if self.r_data[library.keyboard["r"]] == 1:
 				serv.calibrationR()
 				sleep(time_delay_seconds)
 
-			if self.r_data[19] == 1:
+			if self.r_data[library.keyboard["v"]] == 1:
 				lamp.lampOn()
 				sleep(time_delay_seconds)
-
-			if self.r_data[20] == 1:
+			if self.r_data[library.keyboard["b"]] == 1:
 				lamp.lampOff()
 				sleep(time_delay_seconds)
 
@@ -150,47 +152,35 @@ class ClientThread(threading.Thread):
 			if self.sstate == 1:
 				try:
 
-					if self.r_data[4] == 1:
+					if self.r_data[library.keyboard["q"]] == 1:
 						serv.decreaseWheelAngle(7)
-						#sleep(time_delay_seconds)
-
-					if self.r_data[5] == 1:
+					if self.r_data[library.keyboard["e"]] == 1:
 						serv.increaseWheelAngle(7)
-						#sleep(time_delay_seconds)
 
-					if self.r_data[8] == 1:
-						serv.increaseManAngle(5, 4)
-						#sleep(time_delay_seconds )
+					if self.r_data[library.keyboard["u"]] == 1:
+						serv.increaseManAngle(library.servoName["man1"], 4)
+					if self.r_data[library.keyboard["h"]] == 1:
+						serv.decreaseManAngle(library.servoName["man1"], 4)
 
-					if self.r_data[9] == 1:
-						serv.decreaseManAngle(5, 4)
-						#sleep(time_delay_seconds)
+					if self.r_data[library.keyboard["i"]] == 1:
+						serv.increaseManAngle(library.servoName["man2"], 4)
+					if self.r_data[library.keyboard["j"]] == 1:
+						serv.decreaseManAngle(library.servoName["man2"], 4)
 
-					if self.r_data[10] == 1:
-						serv.increaseManAngle(6, 4)
-						#sleep(time_delay_seconds)
+					if self.r_data[library.keyboard["o"]] == 1:
+						serv.increaseManAngle(library.servoName["man3"], 4)
+					if self.r_data[library.keyboard["k"]] == 1:
+						serv.decreaseManAngle(library.servoName["man3"], 4)
 
-					if self.r_data[11] == 1:
-						serv.decreaseManAngle(6, 4)
-						#sleep(time_delay_seconds)
+					if self.r_data[library.keyboard["p"]] == 1:
+						serv.increaseManAngle(library.servoName["man4"], 6)
+					if self.r_data[library.keyboard["l"]] == 1:
+						serv.decreaseManAngle(library.servoName["man4"], 6)
 
-					if self.r_data[12] == 1:
-						serv.increaseManAngle(7, 4)
-						# sleep(time_delay_seconds)
-
-					if self.r_data[13] == 1:
-						serv.decreaseManAngle(7, 4)
-						# sleep(time_delay_seconds)
-
-					if self.r_data[14] == 1:
-						serv.increaseManAngle(8, 6)
-						# sleep(time_delay_seconds)
-
-					if self.r_data[15] == 1:
-						serv.decreaseManAngle(8, 6)
-						# sleep(time_delay_seconds)
-
-
+					if self.r_data[library.keyboard["g"]] == 1:
+						serv.increaseManAngle(library.servoName["man5"], 6)
+					if self.r_data[library.keyboard["y"]] == 1:
+						serv.decreaseManAngle(library.servoName["man5"], 6)
 				except AttributeError:
 					pass
 
@@ -199,30 +189,22 @@ class ClientThread(threading.Thread):
 			sleep(pulsebeat)
 			if self.mstate == 1:
 				try:
-					if self.r_data[0] == 1:
+					if self.r_data[library.keyboard["w"]] == 1:
 						motor.rotate_clockwise()
-
-
-					elif self.r_data[1] == 1:
+					elif self.r_data[library.keyboard["s"]] == 1:
 						motor.rotate_counterwise()
-
-
-					elif self.r_data[3] == 1:
-						#motor.turn_left()
+					elif self.r_data[library.keyboard["d"]] == 1:
 						motor.turn_right()
-
-
-					elif self.r_data[2] == 1:
-						#motor.turn_right()
+					elif self.r_data[library.keyboard["a"]] == 1:
 						motor.turn_left()
+
 					else:
 						motor.motor_stop()
-
 				except AttributeError:
 					pass
 
 '''SOCKET MODULE '''
-HOST = "192.168.0.13"
+HOST = "192.168.0.95"
 PORT = 65432
 
 
