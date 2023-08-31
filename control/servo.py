@@ -65,8 +65,7 @@ class ServoController:
 
     def Set_Pulse(self, channel, pulse):
         pulse = pulse * 4096 / 20000
-        self.SetPWM(channel, 50, int(pulse))
+        self.SetPWM(channel, 0, int(pulse))
 
-    def map(x, in_min, in_max, out_min, out_max):
-        return (x - in_min) * (out_max - out_min + 1) / (in_max - in_min + 1) + out_min
-
+    def map(degrees, in_min, in_max, out_min, out_max):
+        return (degrees - in_min) * (out_max - out_min) / (in_max - in_min) + out_min

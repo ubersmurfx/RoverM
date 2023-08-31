@@ -42,7 +42,7 @@ except:
 try:
 	serv = ServoEvent()
 	sleep(time_calibrate * 3)
-	serv.calibrationR()
+	#serv.calibrationR()
 	sleep(time_calibrate * 3)
 	print("Servo init complete")
 except:
@@ -64,10 +64,13 @@ class ClientThread(threading.Thread):
 		self.m_speed = 80
 		self.k_turn = 0.4
 		self.boost = 1
-		self.sstate = 0
-		self.mstate = 1
+		self.sstate = 1
+		self.mstate = 0
 		self.lampState = 0
 		print("[+] New server started from: ", ip + str(port))
+		if (self.sstate == 1 and self.mstate == 1):
+			print("Rover is ready")
+
 
 	def reciever(self):
 		_exit = 1
@@ -82,7 +85,6 @@ class ClientThread(threading.Thread):
 				if len(data) == 26:
 					self.r_data = np.frombuffer(data, dtype=np.uint8)
 					if ((np.sum(self.r_data) - self.r_data[25]) % 2) != self.r_data[25]:
-						print("Parity bit")
 						count = count + 1
 					count = 0
 				else:
@@ -122,9 +124,9 @@ class ClientThread(threading.Thread):
 		while True:
 			sleep(pulsebeat)
 			if self.r_data[library.keyboard["1"]] == 1:
-				serv.decreaseCamAngle(3)
+				serv.decreaseCamAngle(1)
 			if self.r_data[library.keyboard["2"]] == 1:
-				serv.increaseCamAngle(3)
+				serv.increaseCamAngle(1)
 
 			if self.r_data[library.keyboard["x"]] == 1:
 				self.boost = 1
@@ -140,10 +142,17 @@ class ClientThread(threading.Thread):
 				sleep(time_delay_seconds)
 
 			if self.r_data[library.keyboard["v"]] == 1:
-				lamp.lampOn()
-				sleep(time_delay_seconds)
+				serv.set_pulse_(0, 6000)
+				serv.set_pulse_(1, 6000)
+				#lamp.lampOn()
+				#sleep(time_delay_seconds)
 			if self.r_data[library.keyboard["b"]] == 1:
-				lamp.lampOff()
+				serv.set_pulse_(0, 1500)
+				serv.set_pulse_(1, 1500)
+				#lamp.lampOff()
+				#sleep(time_delay_seconds)
+			if self.r_data[library.keyboard["t"]] == 1:
+				serv.calibrationE()
 				sleep(time_delay_seconds)
 
 	def servorer(self):
@@ -151,11 +160,10 @@ class ClientThread(threading.Thread):
 			sleep(pulsebeat)
 			if self.sstate == 1:
 				try:
-
 					if self.r_data[library.keyboard["q"]] == 1:
-						serv.decreaseWheelAngle(7)
+						serv.decreaseWheelAngle(1)
 					if self.r_data[library.keyboard["e"]] == 1:
-						serv.increaseWheelAngle(7)
+						serv.increaseWheelAngle(1)
 
 					if self.r_data[library.keyboard["u"]] == 1:
 						serv.increaseManAngle(library.servoName["man1"], 4)
@@ -178,9 +186,9 @@ class ClientThread(threading.Thread):
 						serv.decreaseManAngle(library.servoName["man4"], 6)
 
 					if self.r_data[library.keyboard["g"]] == 1:
-						serv.increaseManAngle(library.servoName["man5"], 6)
+						serv.increaseManAngle(library.servoName["man5"], 1)
 					if self.r_data[library.keyboard["y"]] == 1:
-						serv.decreaseManAngle(library.servoName["man5"], 6)
+						serv.decreaseManAngle(library.servoName["man5"], 1)
 				except AttributeError:
 					pass
 
@@ -204,7 +212,7 @@ class ClientThread(threading.Thread):
 					pass
 
 '''SOCKET MODULE '''
-HOST = "192.168.0.95"
+HOST = "192.168.0.100"
 PORT = 65432
 
 
