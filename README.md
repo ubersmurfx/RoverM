@@ -1,3 +1,4 @@
+revision v1.2
 # **Rover & Student**
 Ссылка на актуальный репозиторий проекта: [Открыть ссылку](https://github.com/Ubersmurf2010/RoverM/)
 
