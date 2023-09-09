@@ -1,5 +1,8 @@
 '''Configuration'''
 
+HOST="192.168.0.15"
+PORT=65432
+
 index = 1
 
 keyboard = {

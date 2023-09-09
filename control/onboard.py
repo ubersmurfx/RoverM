@@ -7,10 +7,19 @@ import sys
 import numpy as np
 from time import sleep
 import math
+from disp import display
 
 from h39 import rmotor, lightBulb
 from event import ServoEvent
 import library
+
+man = 45
+
+'''DIsplay init'''
+D = display.Display()
+D.show_params(["man1", "man2", "man3", "man4"],[man, 4324, 43243, 4324324])
+sleep(1)
+D.show_image('disp/bentley.png')
 
 '''TIMINGS '''
 pulsebeat = 0.04
@@ -82,7 +91,7 @@ class ClientThread(threading.Thread):
 				if len(data) == 26:
 					self.r_data = np.frombuffer(data, dtype=np.uint8)
 					if ((np.sum(self.r_data) - self.r_data[25]) % 2) != self.r_data[25]:
-						print("Parity bit")
+						print(self.r_data)
 						count = count + 1
 					count = 0
 				else:
@@ -203,9 +212,6 @@ class ClientThread(threading.Thread):
 				except AttributeError:
 					pass
 
-'''SOCKET MODULE '''
-HOST = "192.168.0.95"
-PORT = 65432
 
 
 
@@ -215,15 +221,15 @@ if __name__ == "__main__":
 		print("Waiting for connection")
 		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-		s.bind((HOST, PORT))
+		s.bind((library.HOST, library.PORT))
 		s.listen(5)
 		clientsocket, address = s.accept()
-		print(f"Connected from {address} has been established!")
+		print("Connected from {address} has been refused!")
 	except Exception as e:
 		raise ConnectionError(f"Failed to connect to {address}", str(e))
 
 
-	newconnection = ClientThread(HOST, PORT)
+	newconnection = ClientThread(library.HOST, library.PORT)
 	newconnection.run()
 
 	while True:     # бесконечный цикл
