@@ -40,3 +40,4 @@ class Display():
 		self.image = Image.open(path).convert('1')
 		self.oled.image(self.image)
 		self.oled.show()
+

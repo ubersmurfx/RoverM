@@ -17,7 +17,6 @@ man = 45
 
 '''DIsplay init'''
 D = display.Display()
-D.show_params(["man1", "man2", "man3", "man4"],[man, 4324, 43243, 4324324])
 sleep(1)
 D.show_image('disp/bentley.png')
 
@@ -40,8 +39,8 @@ except:
 try:
 	motor = rmotor()
 	sleep(time_calibrate)
-	motor.modify_pwm1(rmotor.pwm_signal, 80, 3000)
-	motor.modify_pwm2(rmotor.pwm_signal1, 80, 3000)
+	motor.modify_pwm1(rmotor.pwm_signal, 95, 3000)
+	motor.modify_pwm2(rmotor.pwm_signal1, 95, 3000)
 	print("Motor init complete")
 	sleep(time_calibrate)
 except:
@@ -74,7 +73,7 @@ class ClientThread(threading.Thread):
 		self.k_turn = 0.4
 		self.boost = 1
 		self.sstate = 1
-		self.mstate = 0
+		self.mstate = 1
 		self.lampState = 0
 		print("[+] New server started from: ", ip + str(port))
 		if (self.sstate == 1 and self.mstate == 1):
@@ -153,15 +152,13 @@ class ClientThread(threading.Thread):
 				sleep(time_delay_seconds)
 
 			if self.r_data[library.keyboard["v"]] == 1:
-				serv.set_pulse_(0, 6000)
-				serv.set_pulse_(1, 6000)
-				#lamp.lampOn()
-				#sleep(time_delay_seconds)
+				lamp.lampOn()
+				sleep(time_delay_seconds)
+
 			if self.r_data[library.keyboard["b"]] == 1:
-				serv.set_pulse_(0, 1500)
-				serv.set_pulse_(1, 1500)
-				#lamp.lampOff()
-				#sleep(time_delay_seconds)
+				lammp.lampOff()
+				sleep(time_delay_seconds)
+
 			if self.r_data[library.keyboard["t"]] == 1:
 				serv.calibrationE()
 				sleep(time_delay_seconds)
@@ -172,34 +169,34 @@ class ClientThread(threading.Thread):
 			if self.sstate == 1:
 				try:
 					if self.r_data[library.keyboard["q"]] == 1:
-						serv.decreaseWheelAngle(1)
+						serv.decreaseWheelAngle(5)
 					if self.r_data[library.keyboard["e"]] == 1:
-						serv.increaseWheelAngle(1)
+						serv.increaseWheelAngle(5)
 
 					if self.r_data[library.keyboard["u"]] == 1:
-						serv.increaseManAngle(library.servoName["man1"], 4)
+						serv.increaseManAngle(library.servoName["man1"], 2)
 					if self.r_data[library.keyboard["h"]] == 1:
-						serv.decreaseManAngle(library.servoName["man1"], 4)
+						serv.decreaseManAngle(library.servoName["man1"], 2)
 
 					if self.r_data[library.keyboard["i"]] == 1:
-						serv.increaseManAngle(library.servoName["man2"], 4)
+						serv.increaseManAngle(library.servoName["man2"], 2)
 					if self.r_data[library.keyboard["j"]] == 1:
-						serv.decreaseManAngle(library.servoName["man2"], 4)
+						serv.decreaseManAngle(library.servoName["man2"], 2)
 
 					if self.r_data[library.keyboard["o"]] == 1:
-						serv.increaseManAngle(library.servoName["man3"], 4)
+						serv.increaseManAngle(library.servoName["man3"], 3)
 					if self.r_data[library.keyboard["k"]] == 1:
-						serv.decreaseManAngle(library.servoName["man3"], 4)
+						serv.decreaseManAngle(library.servoName["man3"], 3)
 
 					if self.r_data[library.keyboard["p"]] == 1:
-						serv.increaseManAngle(library.servoName["man4"], 6)
+						serv.increaseManAngle(library.servoName["man4"], 4)
 					if self.r_data[library.keyboard["l"]] == 1:
-						serv.decreaseManAngle(library.servoName["man4"], 6)
+						serv.decreaseManAngle(library.servoName["man4"], 4)
 
 					if self.r_data[library.keyboard["g"]] == 1:
-						serv.increaseManAngle(library.servoName["man5"], 1)
+						serv.increaseManAngle(library.servoName["man5"], 3)
 					if self.r_data[library.keyboard["y"]] == 1:
-						serv.decreaseManAngle(library.servoName["man5"], 1)
+						serv.decreaseManAngle(library.servoName["man5"], 3)
 				except AttributeError:
 					pass
 

@@ -1,6 +1,6 @@
 '''Configuration'''
 
-HOST="192.168.0.15"
+HOST="192.168.0.100"
 PORT=65432
 
 index = 1
