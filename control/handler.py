@@ -115,11 +115,17 @@ class ClientThread(threading.Thread):
 		while True:
 			sleep(library.pulsebeat)
 			if self.r_data[library.keyboard["x"]] == 1:
-				self.boost = 1
+				if self.boost <= 0.95:
+					self.boost = self.boost + 0.05
+					self.display.show_params(["speed", "", "", ""], [round(self.boost, 2), "", "", ""])
+					print("current speed", round(self.boost, 2))
 				self.motor.motor_speed_dercrese(self.m_speed, self.boost)
 				sleep(library.time_delay_seconds)
 			if self.r_data[library.keyboard["z"]] == 1:
-				self.boost = 0.4
+				if self.boost > 0.3:
+					self.boost = self.boost - 0.05
+					self.display.show_params(["speed", "", "", ""], [round(self.boost, 2), "", "", ""])
+					print("z", round(self.boost, 2))
 				self.motor.motor_speed_increase(self.m_speed, self.boost)
 				sleep(library.time_delay_seconds)
 
@@ -133,6 +139,7 @@ class ClientThread(threading.Thread):
 
 			if (self.r_data[library.keyboard["1"]] == 1) and  (self.r_data[library.keyboard["z"]] == 1) and  (self.r_data[library.keyboard["p"]] == 1):
 				self.closeConnection()
+				self.display.show_params(["shutdown", "", "", ""], ["......", "......", "...", ""])
 				os.system("shutdown now")
 
 
@@ -155,8 +162,10 @@ class ClientThread(threading.Thread):
 						self.serv.increaseCamAngle(1)
 
 					if self.r_data[library.keyboard["q"]] == 1:
+						print(1)
 						self.serv.decreaseWheelAngle(5)
 					if self.r_data[library.keyboard["e"]] == 1:
+						print(2)
 						self.serv.increaseWheelAngle(5)
 
 					if self.r_data[library.keyboard["u"]] == 1:
@@ -200,7 +209,6 @@ class ClientThread(threading.Thread):
 						self.motor.turn_right()
 					elif self.r_data[library.keyboard["a"]] == 1:
 						self.motor.turn_left()
-
 					else:
 						self.motor.motor_stop()
 				except AttributeError:
@@ -260,8 +268,7 @@ if __name__ == "__main__":
 	newconnection = ClientThread(library.HOST, library.PORT)
 	newconnection.run()
 
-
-	while True:     # бесконечный цикл
+	while True:
 		try:
 			sleep(10)
 		except KeyboardInterrupt:
