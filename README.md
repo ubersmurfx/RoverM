@@ -63,7 +63,7 @@ sudo apt install git
 Скопируем репозиторий в домашний каталог.
 ```
 cd ~/
-sudo git clone https://github.com/Ubersumrf2010/RoverM
+git clone --single-branch --branch rev_1.0 https://github.com/Ubersmurf2010/RoverM.git
 ```
 Для работы *onpult.py* необходимо установить сам python и дополнительные зависимости к нему.
 Сначала необходимо убедиться, что Python 3 установлен в системе выполнив команду в терминале.
@@ -78,7 +78,7 @@ sudo pip install pynput
 ## Windows
 Скачать git на Windows [отсюда](https://git-scm.com/download/win). Перейти в рабочую папку проекта.
 ```
-git clone https://github.com/Ubersumrf2010/RoverM
+git clone --single-branch --branch rev_1.0 https://github.com/Ubersmurf2010/RoverM.git
 ```
 Сначала необходимо убедиться, что Python 3 установлен в системе выполнив команду в терминале.
 ```
@@ -96,6 +96,7 @@ pip install pynput
 В конфигурационном файле *cval.py* можно настроить клавиши для управления роботом.
 4. После того, как нам удалось подключиться к плате, необходимо запустить исполняемый файл *onboard.py*.
 ```
+git clone --single-branch --branch rev_1.0 https://github.com/Ubersmurf2010/RoverM.git
 cd ~/
 cd RoverM/control/
 sudo python onboard.py
