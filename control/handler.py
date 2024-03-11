@@ -162,10 +162,8 @@ class ClientThread(threading.Thread):
 						self.serv.increaseCamAngle(1)
 
 					if self.r_data[library.keyboard["q"]] == 1:
-						print(1)
 						self.serv.decreaseWheelAngle(5)
 					if self.r_data[library.keyboard["e"]] == 1:
-						print(2)
 						self.serv.increaseWheelAngle(5)
 
 					if self.r_data[library.keyboard["u"]] == 1:
@@ -205,9 +203,9 @@ class ClientThread(threading.Thread):
 						self.motor.rotate_clockwise()
 					elif self.r_data[library.keyboard["s"]] == 1:
 						self.motor.rotate_counterwise()
-					elif self.r_data[library.keyboard["d"]] == 1:
-						self.motor.turn_right()
 					elif self.r_data[library.keyboard["a"]] == 1:
+						self.motor.turn_right()
+					elif self.r_data[library.keyboard["d"]] == 1:
 						self.motor.turn_left()
 					else:
 						self.motor.motor_stop()
@@ -217,8 +215,6 @@ class ClientThread(threading.Thread):
 	def setupDisplay(self):
 		try:
 			self.display = display.Display()
-			self.display.show_image('disp/rtc.jpg')
-			sleep(2)
 			print("display: OK")
 
 		except:

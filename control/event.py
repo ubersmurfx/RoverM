@@ -2,18 +2,18 @@ from servo import ServoController
 
 
 class ServoEvent():
-	def __init__(self, debug=False):
+	def __init__(self, debug=True):
 		self.controller = ServoController(0x40, debug=False)
 		self.controller.setPWMFreq(50)
 		self.debug = debug
 		self.diff = 0.5
-		self.angle1 = 80
+		self.angle1 = 90
 		self.angle2 = 90
 		self.angle3 = 90
 		self.angle4 = 90
 		self.cam_angle = 90
-		self.man = [120, 130, 130, 90, 90]
-		self.calibrateAngles = [80, 90, 90, 90, 90, 120, 130, 130, 90, 90]
+		self.man = [140, 130, 130, 90, 90]
+		self.calibrateAngles = [100, 100, 90, 110, 90, 140, 130, 130, 90, 90]
 
 		self.deltaAngle = 45
 		self.maxAngles = {
@@ -21,9 +21,9 @@ class ServoEvent():
 		1: self.calibrateAngles[1] + self.deltaAngle,
 		2: self.calibrateAngles[2] + self.deltaAngle,
 		3: self.calibrateAngles[3] + self.deltaAngle,
-		4: 180,
+		4: 80,
 		5: 220,
-		6: 270,
+		6: 230,
 		7: 200,
 		8: 180,
 		9: 180
@@ -33,12 +33,12 @@ class ServoEvent():
 		1: self.calibrateAngles[1] - self.deltaAngle,
 		2: self.calibrateAngles[2] - self.deltaAngle,
 		3: self.calibrateAngles[3] - self.deltaAngle,
-		4: -1000,
-		5: 30,
+		4: 20,
+		5: 60,
 		6: 60,
 		7: 45,
 		8: 0,
-		9: 15
+		9: 45
 		}
 
 	def cstate_get_angle(self, angle):
@@ -185,6 +185,7 @@ class ServoEvent():
 				self.angle4 = self.angle4 + value * self.diff
 
 	def increaseCamAngle(self, value):
+		print(self.cam_angle)
 		if self.cam_angle < self.maxAngles[4]:
 			self.cam_angle = self.cam_angle + value
 			self.set_angle150(4, self.cam_angle)
@@ -192,6 +193,7 @@ class ServoEvent():
 			self.cam_angle = self.cam_angle - value
 
 	def decreaseCamAngle(self, value):
+		print(self.cam_angle)
 		if self.cam_angle > self.minAngles[4]:
 			self.cam_angle = self.cam_angle - value
 			self.set_angle150(4, self.cam_angle)
