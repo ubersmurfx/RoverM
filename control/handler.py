@@ -24,9 +24,8 @@ class ClientThread(threading.Thread):
 			       0, 0, 0, 0, 0,
 			       0, 0, 0, 0, 0,
 			       0, 0, 0, 0, 0,
-			       0, 0, 0, 0, 0,
-			       0]
-		self._defaultpackage = 52
+			       0, 0, 0, 0]
+		self._defaultpackage = 48
 		self.debug = debug
 		self.m_speed = 95
 		self.k_turn = 0.4
@@ -70,12 +69,12 @@ class ClientThread(threading.Thread):
 				if (self.debug):
 					print("Size of recieving data", len(data))
 
-				if (len(data) < 26):
+				if (len(data) < 24):
 					count = count + 1
 
-				if (len(data) == 26):
+				if (len(data) == 24):
 					self.r_data = np.frombuffer(data, dtype=np.uint8)
-					if ((np.sum(self.r_data) - self.r_data[25]) % 2) != self.r_data[25]:
+					if ((np.sum(self.r_data) - self.r_data[23]) % 2) != self.r_data[23]:
 						#print(self.r_data)
 						count = count + 1
 					count = 0
@@ -87,8 +86,7 @@ class ClientThread(threading.Thread):
 						       0, 0, 0, 0, 0,
   						       0, 0, 0, 0, 0,
 						       0, 0, 0, 0, 0,
-						       0, 0, 0, 0, 0,
-						       0]
+						       0, 0, 0, 0]
 
 				if count > 10:
 					self.motor.motor_stop()
@@ -139,7 +137,7 @@ class ClientThread(threading.Thread):
 
 			if (self.r_data[library.keyboard["1"]] == 1) and  (self.r_data[library.keyboard["z"]] == 1) and  (self.r_data[library.keyboard["p"]] == 1):
 				self.closeConnection()
-				self.display.show_params(["shutdown", "", "", ""], ["......", "......", "...", ""])
+				self.display.show_params(["shutdown", "powerOff", "", ""], ["......", "through 15 sec...", "", ""])
 				os.system("shutdown now")
 
 
@@ -162,10 +160,8 @@ class ClientThread(threading.Thread):
 						self.serv.increaseCamAngle(1)
 
 					if self.r_data[library.keyboard["q"]] == 1:
-						print(1)
 						self.serv.decreaseWheelAngle(5)
 					if self.r_data[library.keyboard["e"]] == 1:
-						print(2)
 						self.serv.increaseWheelAngle(5)
 
 					if self.r_data[library.keyboard["u"]] == 1:
@@ -187,11 +183,6 @@ class ClientThread(threading.Thread):
 						self.serv.increaseManAngle(library.servoName["man4"], 4)
 					if self.r_data[library.keyboard["l"]] == 1:
 						self.serv.decreaseManAngle(library.servoName["man4"], 4)
-
-					if self.r_data[library.keyboard["g"]] == 1:
-						self.serv.increaseManAngle(library.servoName["man5"], 3)
-					if self.r_data[library.keyboard["y"]] == 1:
-						self.serv.decreaseManAngle(library.servoName["man5"], 3)
 
 				except AttributeError:
 					pass
@@ -217,8 +208,6 @@ class ClientThread(threading.Thread):
 	def setupDisplay(self):
 		try:
 			self.display = display.Display()
-			self.display.show_image('disp/rtc.jpg')
-			sleep(2)
 			print("display: OK")
 
 		except:

@@ -1,6 +1,6 @@
 '''Configuration'''
 
-dataType = "26?"
+dataType = "24?"
 delay = 0.05
 HOST = "192.168.0.11"
 PORT = 65432
@@ -26,12 +26,10 @@ keyboard = {
     "k": index + 13,  #man3_down
     "p": index + 14,  #man4_up
     "l": index + 15,  #man4_down
-    "g": index + 16,  #man5_up
-    "y": index + 17,  #man5_down
-    "x": index + 18,  #speed_increase
-    "z": index + 19,  #speed_deacrease
-    "r": index + 20,  #reset
-    "v": index + 21,  #lamp_on
-    "b": index + 22,  #lamp_off
-    "t": index + 23  #romb_wheel
+    "x": index + 16,  #speed_increase
+    "z": index + 17,  #speed_deacrease
+    "r": index + 18,  #reset
+    "v": index + 19,  #lamp_on
+    "b": index + 20,  #lamp_off
+    "t": index + 21  #romb_wheel
 }

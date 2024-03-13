@@ -12,8 +12,8 @@ class ServoEvent():
 		self.angle3 = 90
 		self.angle4 = 90
 		self.cam_angle = 90
-		self.man = [120, 130, 130, 90, 90]
-		self.calibrateAngles = [80, 90, 90, 90, 90, 120, 130, 130, 90, 90]
+		self.man = [140, 130, 130, 90]
+		self.calibrateAngles = [90, 90, 100, 80, 90, 140, 130, 130, 90]
 
 		self.deltaAngle = 45
 		self.maxAngles = {
@@ -21,24 +21,22 @@ class ServoEvent():
 		1: self.calibrateAngles[1] + self.deltaAngle,
 		2: self.calibrateAngles[2] + self.deltaAngle,
 		3: self.calibrateAngles[3] + self.deltaAngle,
-		4: 180,
+		4: 80,
 		5: 220,
-		6: 270,
+		6: 250,
 		7: 200,
-		8: 180,
-		9: 180
+		8: 180
 		}
 		self.minAngles = {
 		0: self.calibrateAngles[0] - self.deltaAngle,
 		1: self.calibrateAngles[1] - self.deltaAngle,
 		2: self.calibrateAngles[2] - self.deltaAngle,
 		3: self.calibrateAngles[3] - self.deltaAngle,
-		4: -1000,
-		5: 30,
+		4: 20,
+		5: 60,
 		6: 60,
 		7: 45,
-		8: 0,
-		9: 15
+		8: 0
 		}
 
 	def cstate_get_angle(self, angle):
@@ -99,7 +97,6 @@ class ServoEvent():
 		self.man[1] = self.calibrateAngles[6]
 		self.man[2] = self.calibrateAngles[7]
 		self.man[3] = self.calibrateAngles[8]
-		self.man[4] = self.calibrateAngles[9]
 
 		self.set_angle180(0, self.angle1)
 		self.set_angle180(1, self.angle2)
@@ -110,7 +107,6 @@ class ServoEvent():
 		self.set_angle270(6, self.man[1])
 		self.set_angle270(7, self.man[2])
 		self.set_angle180(8, self.man[3])
-		self.set_angle180(9, self.man[4])
 
 	def decreaseWheelAngle(self, value):
 #turn left
