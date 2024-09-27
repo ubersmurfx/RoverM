@@ -5,7 +5,7 @@ pulsebeat = 0.04
 time_delay_seconds = 0.05
 time_calibrate = 0.1
 
-HOST="192.168.0.11"
+HOST="192.168.61.63"
 PORT=65432
 
 index = 1
