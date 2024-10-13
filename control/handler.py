@@ -108,14 +108,22 @@ class ClientThread(threading.Thread):
 			sleep(library.pulsebeat)
 			if self.mstate == 1:
 				try:
-					if self.r_data[library.keyboard["w"]] == 1:
+					if (self.r_data[library.keyboard["w"]] == 1 or self.r_data[library.keyboard["s"]]) and self.r_data[library.keyboard["d"]] == 1:
+						self.motor.turn_right()
+					elif (self.r_data[library.keyboard["w"]] == 1 or self.r_data[library.keyboard["s"]]) and self.r_data[library.keyboard["a"]] == 1:
+						self.motor.turn_left()					
+					elif self.r_data[library.keyboard["w"]] == 1:
 						self.motor.rotate_clockwise()
 					elif self.r_data[library.keyboard["s"]] == 1:
 						self.motor.rotate_counterwise()
-					elif self.r_data[library.keyboard["d"]] == 1:
-						self.motor.turn_right()
 					elif self.r_data[library.keyboard["a"]] == 1:
-						self.motor.turn_left()
+						self.motor.crab_left()
+					elif self.r_data[library.keyboard["d"]] == 1:
+						self.motor.crab_right()
+					elif self.r_data[library.keyboard["e"]] == 1:
+						self.motor.diagonal_right()
+					elif self.r_data[library.keyboard["q"]] == 1:
+						self.motor.diagonal_left()
 					else:
 						self.motor.motor_stop()
 				except AttributeError:

@@ -9,29 +9,45 @@ time_delay_seconds = 0.1
 
 '''BCM SETUP PINS '''
 
-R1 = 20
-''' IN1'''
+R1_HIGH = 6
+''' IN1 1st driver'''
 
-L1 = 21
-''' IN2 '''
+R1_LOW = 12
+''' IN2 1st driver'''
 
-R2 = 19
-''' IN3 '''
+R2_HIGH = 5
+''' IN3 1st driver'''
 
-L2 = 26
-'''IN4'''
+R2_LOW = 1
+'''IN4 1st driver'''
+
+L1_HIGH = 21
+''' R1 IN1 2nd driver'''
+
+L1_LOW = 20
+'''L1 IN2 2nd driver'''
+
+L2_HIGH = 19
+'''R2 IN3 2nd driver '''
+
+L2_LOW = 26
+'''L2 IN4 2nd driver'''
 
 
 class rmotor:
     def __init__(self, debug = False):
         self.debug = debug
 
-    GPIO.setup(R1, GPIO.OUT)
-    GPIO.setup(L1, GPIO.OUT)
+    GPIO.setup(R1_HIGH, GPIO.OUT)
+    GPIO.setup(R1_LOW, GPIO.OUT)
+    GPIO.setup(R2_HIGH, GPIO.OUT)
+    GPIO.setup(R2_LOW, GPIO.OUT)
 #    GPIO.setup(PWM1, GPIO.OUT)
 
-    GPIO.setup(R2, GPIO.OUT)
-    GPIO.setup(L2, GPIO.OUT)
+    GPIO.setup(L1_HIGH, GPIO.OUT)
+    GPIO.setup(L1_LOW, GPIO.OUT)
+    GPIO.setup(L2_HIGH, GPIO.OUT)
+    GPIO.setup(L2_LOW, GPIO.OUT)
 #    GPIO.setup(PWM2, GPIO.OUT)
 
 #    pwm_signal1 = GPIO.PWM(PWM2, 30)
@@ -53,45 +69,118 @@ class rmotor:
         if (self.debug):
                 print("motor stopped")
 
-        GPIO.output(R1, GPIO.LOW)
-        GPIO.output(L1, GPIO.LOW)
-        GPIO.output(R2, GPIO.LOW)
-        GPIO.output(L2, GPIO.LOW)
+        GPIO.output(R1_HIGH, GPIO.LOW)
+        GPIO.output(R1_LOW, GPIO.LOW)
+        GPIO.output(R2_HIGH, GPIO.LOW)
+        GPIO.output(R2_LOW, GPIO.LOW)
+        GPIO.output(L1_HIGH, GPIO.LOW)
+        GPIO.output(L1_LOW, GPIO.LOW)
+        GPIO.output(L2_HIGH, GPIO.LOW)
+        GPIO.output(L2_LOW, GPIO.LOW)
 
     def rotate_clockwise(self):
         if (self.debug):
                 print("Rotate clockwise")
 
-        GPIO.output(R1, GPIO.HIGH)
-        GPIO.output(L1, GPIO.LOW)
-        GPIO.output(L2, GPIO.LOW)
-        GPIO.output(R2, GPIO.HIGH)
+        GPIO.output(R1_HIGH, GPIO.HIGH)
+        GPIO.output(R1_LOW, GPIO.LOW)
+        GPIO.output(R2_HIGH, GPIO.HIGH)
+        GPIO.output(R2_LOW, GPIO.LOW)
+        GPIO.output(L1_HIGH, GPIO.HIGH)
+        GPIO.output(L1_LOW, GPIO.LOW)
+        GPIO.output(L2_HIGH, GPIO.HIGH)
+        GPIO.output(L2_LOW, GPIO.LOW)
 
     def rotate_counterwise(self):
         if (self.debug):
                 print("Rotate counterwise")
 
-        GPIO.output(R1, GPIO.LOW)
-        GPIO.output(L1, GPIO.HIGH)
-        GPIO.output(L2, GPIO.HIGH)
-        GPIO.output(R2, GPIO.LOW)
-
+        GPIO.output(R1_HIGH, GPIO.LOW)
+        GPIO.output(R1_LOW, GPIO.HIGH)
+        GPIO.output(R2_HIGH, GPIO.LOW)
+        GPIO.output(R2_LOW, GPIO.HIGH)
+        GPIO.output(L1_HIGH, GPIO.LOW)
+        GPIO.output(L1_LOW, GPIO.HIGH)
+        GPIO.output(L2_HIGH, GPIO.LOW)
+        GPIO.output(L2_LOW, GPIO.HIGH)
+        
     def turn_left(self):
         if (self.debug):
                 print("turn left")
 
-        GPIO.output(R1, GPIO.HIGH)
-        GPIO.output(L1, GPIO.LOW)
-        GPIO.output(L2, GPIO.HIGH)
-        GPIO.output(R2, GPIO.LOW)
+        GPIO.output(R1_HIGH, GPIO.HIGH)
+        GPIO.output(R1_LOW, GPIO.LOW)
+        GPIO.output(R2_HIGH, GPIO.HIGH)
+        GPIO.output(R2_LOW, GPIO.LOW)
+        GPIO.output(L1_HIGH, GPIO.LOW)
+        GPIO.output(L1_LOW, GPIO.HIGH)
+        GPIO.output(L2_HIGH, GPIO.LOW)
+        GPIO.output(L2_LOW, GPIO.HIGH)
 
     def turn_right(self):
         if (self.debug):
                 print("Turning right")
-        GPIO.output(R1, GPIO.LOW)
-        GPIO.output(L1, GPIO.HIGH)
-        GPIO.output(L2, GPIO.LOW)
-        GPIO.output(R2, GPIO.HIGH)
+
+        GPIO.output(R1_HIGH, GPIO.LOW)
+        GPIO.output(R1_LOW, GPIO.HIGH)
+        GPIO.output(R2_HIGH, GPIO.LOW)
+        GPIO.output(R2_LOW, GPIO.HIGH)
+        GPIO.output(L1_HIGH, GPIO.HIGH)
+        GPIO.output(L1_LOW, GPIO.LOW)
+        GPIO.output(L2_HIGH, GPIO.HIGH)
+        GPIO.output(L2_LOW, GPIO.LOW)
+
+    def crab_right(self):
+        if (self.debug):
+                print("Crab right")
+
+        GPIO.output(R1_HIGH, GPIO.LOW)
+        GPIO.output(R1_LOW, GPIO.HIGH)
+        GPIO.output(R2_HIGH, GPIO.HIGH)
+        GPIO.output(R2_LOW, GPIO.LOW)
+        GPIO.output(L1_HIGH, GPIO.HIGH)
+        GPIO.output(L1_LOW, GPIO.LOW)
+        GPIO.output(L2_HIGH, GPIO.LOW)
+        GPIO.output(L2_LOW, GPIO.HIGH)
+
+    def crab_left(self):
+        if (self.debug):
+                print("Crab left")
+
+        GPIO.output(R1_HIGH, GPIO.HIGH)
+        GPIO.output(R1_LOW, GPIO.LOW)
+        GPIO.output(R2_HIGH, GPIO.LOW)
+        GPIO.output(R2_LOW, GPIO.HIGH)
+        GPIO.output(L1_HIGH, GPIO.LOW)
+        GPIO.output(L1_LOW, GPIO.HIGH)
+        GPIO.output(L2_HIGH, GPIO.HIGH)
+        GPIO.output(L2_LOW, GPIO.LOW)
+
+    def diagonal_right(self):
+        if (self.debug):
+                print("Diagonal right")
+
+        GPIO.output(R1_HIGH, GPIO.LOW)
+        GPIO.output(R1_LOW, GPIO.LOW)
+        GPIO.output(R2_HIGH, GPIO.HIGH)
+        GPIO.output(R2_LOW, GPIO.LOW)
+        GPIO.output(L1_HIGH, GPIO.HIGH)
+        GPIO.output(L1_LOW, GPIO.LOW)
+        GPIO.output(L2_HIGH, GPIO.LOW)
+        GPIO.output(L2_LOW, GPIO.LOW)
+
+    def diagonal_left(self):
+        if (self.debug):
+                print("Diagonal left")
+
+        GPIO.output(R1_HIGH, GPIO.HIGH)
+        GPIO.output(R1_LOW, GPIO.LOW)
+        GPIO.output(R2_HIGH, GPIO.LOW)
+        GPIO.output(R2_LOW, GPIO.LOW)
+        GPIO.output(L1_HIGH, GPIO.LOW)
+        GPIO.output(L1_LOW, GPIO.LOW)
+        GPIO.output(L2_HIGH, GPIO.HIGH)
+        GPIO.output(L2_LOW, GPIO.LOW)
 
 
     def calibrate(self):
